@@ -1,0 +1,19 @@
+{
+  "name": "alexa-adopt-a-pet",
+  "version": "0.0.1",
+  "license": "LICENSE.md",
+  "readme": "README.md",
+  "scripts": {
+    "preinstall": "cd src && npm i && cd .."
+  },
+  "devDependencies": {
+    "@types/node": "^7.0.29",
+    "gulp": "^3.9.1",
+    "gulp-awslambda": "^0.4.0",
+    "gulp-tap": "^0.4.2",
+    "gulp-typescript": "^3.1.3",
+    "gulp-zip": "^3.2.0",
+    "merge2": "^1.0.2",
+    "typescript": "^2.1.4"
+  }
+}

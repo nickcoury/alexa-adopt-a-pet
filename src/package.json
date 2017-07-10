@@ -1,0 +1,14 @@
+{
+  "name": "alexa-adopt-a-pet",
+  "version": "0.0.1",
+  "license": "LICENSE.md",
+  "description": "Adopt A Pet Alexa Skill",
+  "main": "index.js",
+  "dependencies": {
+    "alexa-app": "^2.3.4",
+    "alexa-app-router": "0.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "0.0.2"
+  }
+}
