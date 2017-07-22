@@ -4,10 +4,12 @@
   "license": "LICENSE.md",
   "readme": "README.md",
   "scripts": {
-    "preinstall": "cd src && npm i && cd .."
+    "preinstall": "cd src && npm i && cd ..",
+    "schemaUtterances": "ts-node util/schemaUtterancesHelper.ts"
   },
   "devDependencies": {
-    "@types/node": "^7.0.29",
+    "@types/es6-promise": "0.0.32",
+    "@types/node": "^6.0.84",
     "gulp": "^3.9.1",
     "gulp-awslambda": "^0.4.0",
     "gulp-tap": "^0.4.2",

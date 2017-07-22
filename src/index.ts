@@ -2,6 +2,9 @@ declare let exports: any;
 import * as alexa from 'alexa-app';
 import * as router from 'alexa-app-router';
 
+const get = require('lodash/get');
+const rp = require('request-promise-native');
+
 import findPetHandler from './handlers/findPet';
 import findShelterHandler from './handlers/findShelter';
 
@@ -20,12 +23,13 @@ import {Animals} from './types';
     FindPetIntent: {
       slots: {ANIMAL_TYPE: 'ANIMAL_TYPE'},
       utterances: [
-        '{for an|for a|}{pet|pets}{| to adopt| to rescue}',
-        '{for an|}{-|ANIMAL_TYPE}{| to adopt| to rescue}'
+        '{for a |}{pet|pets|animal|animals}{| to adopt| to rescue}',
+        'for an {-|ANIMAL_TYPE}{| to adopt| to rescue}',
+        '{adopt a |find a }{-|ANIMAL_TYPE}'
       ]
     },
-    FindShelterIntent: {utterances: ['{for a |for an |}{pet|animal |}{shelter}{| near me| around me}']},
-    MenuIntent: {utterances: ['{get |give |read |}{me |}{the |}{menu|options|help}']},
+    FindShelterIntent: {utterances: ['{for a |for an |}{shelter|shelters}{| near me| around me}']},
+    MenuIntent: {utterances: ['{menu|help}']},
   };
 
   const routes = {
@@ -69,8 +73,55 @@ import {Animals} from './types';
   // If initialization fails and returns false, caller should return true
   // to avoid running async executions.
   function preHandler(request, response) {
-    console.log('intent:' + request.data.request.intent);
-    return true;
+    console.log('preHandler');
+    const consentToken = get(request, 'context.System.user.permissions.consentToken');
+
+    if (!consentToken) {
+      console.log('No consent token found.');
+      requestLocationPermission(request, response);
+
+      return false;
+    }
+
+    return getLocation(request, response);
+  }
+
+  function getLocation(request, response) {
+    console.log('Getting location.');
+    const consentToken = get(request, 'context.System.user.permissions.consentToken');
+    const deviceId = get(request, 'context.System.device.deviceId');
+
+    const options = {
+      headers: {
+        Accept: 'application/json',
+        Authorization: `Bearer ${consentToken}`
+      },
+      json: true,
+      uri: `https://api.amazonalexa.com/v1/devices/${deviceId}/settings/address/countryAndPostalCode`,
+    };
+
+    return rp(options)
+      .then((res: AlexaLocation) => {
+        const postalCode = get(res, 'postalCode');
+
+        if (postalCode) {
+          console.log('Saving location to request object.');
+          request.location = res;
+        } else {
+          requestLocationPermission(request, response);
+
+          throw new Error('Need location permission.');
+        }
+      });
+  }
+
+  function requestLocationPermission(request, response) {
+    response.say('The Adopt a Pet skill requires your location so I can find animals and shelters near you.  Please check your Alexa app to enable your location.');
+    response.card({
+      permissions: ['read::alexa:device:all:address:country_and_postal_code'],
+      type: 'AskForPermissionsConsent',
+    });
+    response.send();
   }
 
   function launchHandler(request, response) {
@@ -78,7 +129,7 @@ import {Animals} from './types';
     let text = '';
 
     text += `Welcome to the Adopt a Pet Alexa skill. Ask for a pet or a shelter. For types of pets you can adopt, say help.`;
-    console.log(text);
+
     response
       .say(text)
       .route('/')
@@ -87,15 +138,13 @@ import {Animals} from './types';
 
   function menuHandler(request, response) {
     const text = [
-        'You can ask for:',
-        'Pets',
-        'Shelters',
-        'or a type of pet to adopt including',
-      ]
-      .concat(Object.keys(Animals))
+      'You can ask for pets, shelters, or a type of pet to adopt including',
+    ]
+      .concat(Object.keys(Animals).join(', '))
+      .concat('What would you like?')
       .map(x => `<p>${x}</p>`)
       .join('');
-    console.log(text);
+
     response
       .say(text)
       .route('/')
@@ -110,3 +159,8 @@ import {Animals} from './types';
       .send();
   }
 })();
+
+export interface AlexaLocation {
+  countryCode: string;
+  postalCode: string;
+}
