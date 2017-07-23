@@ -14,7 +14,20 @@ import {Animals} from './types';
   const app = new alexa.app('alexa-adopt-a-pet');
 
   const config = {
-    defaultRoute: '/',
+    defaultRoutes: {
+      'AMAZON.CancelIntent': '/exit',
+      'AMAZON.HelpIntent': '/menu',
+      'AMAZON.NextIntent': '/',
+      'AMAZON.PreviousIntent': '/',
+      'AMAZON.RepeatIntent': '/',
+      'AMAZON.ResumeIntent': '/',
+      'AMAZON.StartOverIntent': '/',
+      'AMAZON.StopIntent': '/exit',
+      'AMAZON.YesIntent': '/',
+      FindPetIntent: '/pets?offset=0',
+      FindShelterIntent: '/shelters?limit=5',
+      MenuIntent: '/menu',
+    },
     pre: preHandler,
     launch: launchHandler
   };
@@ -33,29 +46,11 @@ import {Animals} from './types';
   };
 
   const routes = {
-    '/': {
-      'AMAZON.CancelIntent': exitHandler,
-      'AMAZON.HelpIntent': menuHandler,
-      'AMAZON.StartOverIntent': launchHandler,
-      'AMAZON.StopIntent': exitHandler,
-      FindPetIntent: findPetHandler,
-      FindShelterIntent: findShelterHandler,
-      MenuIntent: menuHandler,
-    },
-    'pets/{id}': {
-      'AMAZON.CancelIntent': exitHandler,
-      'AMAZON.HelpIntent': menuHandler,
-      'AMAZON.StartOverIntent': launchHandler,
-      FindPetIntent: findPetHandler,
-      MenuIntent: menuHandler,
-    },
-    'shelters/{id}': {
-      'AMAZON.CancelIntent': exitHandler,
-      'AMAZON.HelpIntent': menuHandler,
-      'AMAZON.StartOverIntent': launchHandler,
-      FindShelterIntent: findShelterHandler,
-      MenuIntent: menuHandler,
-    }
+    '/': launchHandler,
+    '/exit': exitHandler,
+    '/menu': menuHandler,
+    '/pets': findPetHandler,
+    '/shelters': findShelterHandler,
   };
 
   router.addRouter(app, config, intents, routes);
@@ -66,7 +61,7 @@ import {Animals} from './types';
   app.messages.GENERIC_ERROR = 'Sorry, something went wrong. Please try saying something else.';
 
   // Connect to lambda
-  exports.handler = app.lambda();
+  exports.handler = app.handler;
   exports.alexa = app;
 
   // Validate request

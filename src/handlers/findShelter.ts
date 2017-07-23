@@ -6,13 +6,15 @@ export default function findShelterHandler(request, response) {
 
   const postalCode = get(request, 'location.postalCode');
 
+  const limit = get(request, 'route.query.limit') || 5;
+  const offset = get(request, 'route.query.offset') || 0;
   const options = {
     json: true,
     qs: {
-      count: '5',
+      count: limit,
       format: 'json',
       location: postalCode,
-      offset: '0',
+      offset: offset,
       output: 'full',
       key: process.env.API_KEY
     },
