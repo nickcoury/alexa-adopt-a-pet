@@ -1,5 +1,5 @@
 export function validateText(text) {
-  text = text.replace(/[^\w\s@/<>.,-="']/gi, '');
+  text = (text || '').replace(/[^\w\s@/<>.,-="']/gi, '').replace('&', 'and');
   return text;
 }
 

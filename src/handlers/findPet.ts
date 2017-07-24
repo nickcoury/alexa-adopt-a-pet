@@ -1,4 +1,5 @@
 import {camelCaseToSpaces, unwindArray, unwindObject, unwindPhotos, Pet} from '../utility/petFinder.service';
+import {validateText} from '../utility/tools';
 
 const get = require('lodash/get');
 const rp = require('request-promise-native');
@@ -18,9 +19,9 @@ export default function findPetHandler(request, response) {
 
   const postalCode = get(request, 'location.postalCode');
 
-  let animal = request.slot('ANIMAL_TYPE') || get(request, 'route.query.animal');
-  console.log('Raw animal type: ' + animal);
-  animal = AnimalsFuzzy[(animal || '').toLowerCase()];
+  const animalQuery = request.slot('ANIMAL_TYPE') || get(request, 'route.query.animal');
+  console.log('Raw animal type: ' + animalQuery);
+  const animal = AnimalsFuzzy[(animalQuery || '').toLowerCase()];
 
   const offset = get(request, 'route.query.offset') || 0;
   const options: any = {
@@ -57,9 +58,9 @@ export default function findPetHandler(request, response) {
       };
 
       let text = `<p>${pet.name || 'This animal'} is a `;
-      text += sizes[pet.size] || '';
-      text += pet.age ? `${pet.age} `: '';
-      text += genders[pet.sex] || '';
+      text += `${sizes[pet.size] || ''} `;
+      text += `${pet.age || ''} `;
+      text += `${genders[pet.sex] || ''} `;
       text += ` ${pet.animal || ''}</p>`;
       text += `<p>${speakBreed(pet.breeds)}</p>`;
       text += `<p>${pet.description || ''}</p>`;
@@ -103,7 +104,7 @@ export default function findPetHandler(request, response) {
         text += `<p>I've sent more details to your Alexa app.</p>`;
       }
 
-      const animalParam = animal ? `&animal=${animal}` : '';
+      const animalParam = animalQuery ? `&animal=${animalQuery}` : '';
       const nextRoute = `/pets?offset=${offset + 1}${animalParam}`;
       response.route({
         'AMAZON.CancelIntent': '/exit',
@@ -114,6 +115,8 @@ export default function findPetHandler(request, response) {
       });
       text += `<p>Would you like to hear another?</p>`
 
+      console.log('Card: ' + JSON.stringify(card));
+      console.log('Text: ' + JSON.stringify(text));
       return response.card(card).say(text).send();
     })
     .catch(function (err) {
@@ -124,16 +127,23 @@ export default function findPetHandler(request, response) {
 }
 
 function mapPetResponse(response: any): Pet[] {
+  console.log('Pet response: ' + JSON.stringify(response));
   const pets = [].concat(get(response, 'petfinder.pets.pet', []));
 
   return pets.map(pet => {
-    return {
+    const result: Pet = {
       ...unwindObject(pet),
-      options: unwindArray(get(pet, 'options.option')).map(camelCaseToSpaces),
+      options: unwindArray(get(pet, 'options.option')).map(camelCaseToSpaces).map(validateText),
       contact: unwindObject(get(pet, 'contact')),
-      breeds: unwindArray(get(pet, 'breeds.breed')),
+      breeds: unwindArray(get(pet, 'breeds.breed')).map(validateText),
       photos: unwindPhotos(get(pet, 'media.photos.photo'))
     };
+
+    result.animal = validateText((result.animal || '').replace('Small & Furry', 'Animal'));
+    result.name = validateText(result.name);
+    result.description = validateText(result.description);
+
+    return result;
   });
 }
 
