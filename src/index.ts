@@ -38,11 +38,11 @@ import {Animals} from './types';
       slots: {ANIMAL_TYPE: 'ANIMAL_TYPE'},
       utterances: [
         '{for a |}{pet|pets|animal|animals}{| to adopt| to rescue}',
-        'for an {-|ANIMAL_TYPE}{| to adopt| to rescue}',
+        'for {a|an} {-|ANIMAL_TYPE}{| to adopt| to rescue}',
         '{adopt a |find a }{-|ANIMAL_TYPE}'
       ]
     },
-    FindShelterIntent: {utterances: ['{for a |for an |}{shelter|shelters}{| near me| around me}']},
+    FindShelterIntent: {utterances: ['{for a |for an |}{shelter|shelters|rescue}{| near me| around me}']},
     MenuIntent: {utterances: ['{menu|help}']},
   };
 
@@ -124,7 +124,7 @@ import {Animals} from './types';
     console.log('launchHandler');
     let text = '';
 
-    text += `Welcome to the Adopt a Pet Alexa skill. Ask for a pet or a shelter. For types of pets you can adopt, say help.`;
+    text += `Welcome to the Adopt a Pet Alexa skill. Ask for a pet or a shelter. For types of <phoneme alphabet="ipa" ph="pɛts">pets</phoneme> you can adopt, say help.`;
 
     response
       .say(text)
@@ -134,7 +134,7 @@ import {Animals} from './types';
 
   function menuHandler(request, response) {
     const text = [
-      'You can ask for pets, shelters, or a type of pet to adopt including',
+      'You can ask for <phoneme alphabet="ipa" ph="pɛts">pets</phoneme>, shelters, or a type of pet to adopt including',
     ]
       .concat(Object.keys(Animals).join(', '))
       .concat('What would you like?')

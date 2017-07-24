@@ -1,3 +1,5 @@
+import {unwindObject, Shelter} from '../utility/petFinder.service';
+
 const get = require('lodash/get');
 const rp = require('request-promise-native');
 
@@ -79,34 +81,8 @@ export default function findShelterHandler(request, response) {
       });
 }
 
-function mapShelterResponse(response: any): Promise<Shelter[]> {
-  const shelters = get(response, 'petfinder.shelters.shelter', []);
+function mapShelterResponse(response: any): Shelter[] {
+  const shelters = [].concat(get(response, 'petfinder.shelters.shelter', []));
 
-  return shelters.map(shelter => {
-    Object.keys(shelter).forEach(key => {
-      if (shelter[key] && shelter[key].$t) {
-        shelter[key] = shelter[key].$t;
-      } else {
-        delete shelter[key];
-      }
-    });
-
-    return shelter;
-  });
-}
-
-export interface Shelter {
-  address1?: string;
-  address2?: string;
-  city?: string;
-  country?: string;
-  email?: string;
-  fax?: string;
-  id?: string;
-  latitude?: string;
-  longitude?: string;
-  name?: string;
-  phone?: string;
-  state?: string;
-  zip?: string;
+  return shelters.map(unwindObject);
 }
