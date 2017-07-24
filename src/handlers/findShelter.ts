@@ -58,6 +58,18 @@ export default function findShelterHandler(request, response) {
         };
         text += `<p>I've sent this list to your Alexa app.</p>`;
 
+        if (shelters.length === limit) {
+          const nextRoute = `/shelters?limit=${limit}&offset=${offset + limit}`;
+          response.route({
+            'AMAZON.CancelIntent': '/exit',
+            'AMAZON.NextIntent': nextRoute,
+            'AMAZON.NoIntent': '/exit',
+            'AMAZON.YesIntent': nextRoute,
+            FindShelterIntent: nextRoute,
+          });
+          text += `<p>Would you like to hear more?</p>`
+        }
+
         return response.card(card).say(text).send();
       })
       .catch(function (err) {

@@ -6,7 +6,7 @@
   "main": "index.js",
   "dependencies": {
     "alexa-app": "^4.0.1",
-    "alexa-app-router": "alexa-js/alexa-app-router#router-v0.1",
+    "alexa-app-router": "^0.1.0",
     "lodash": "^4.17.4",
     "request": "^2.81.0",
     "request-promise-native": "^1.0.4"

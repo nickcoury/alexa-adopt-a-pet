@@ -18,6 +18,7 @@ import {Animals} from './types';
       'AMAZON.CancelIntent': '/exit',
       'AMAZON.HelpIntent': '/menu',
       'AMAZON.NextIntent': '/',
+      'AMAZON.NoIntent': '/exit',
       'AMAZON.PreviousIntent': '/',
       'AMAZON.RepeatIntent': '/',
       'AMAZON.ResumeIntent': '/',
