@@ -8,3 +8,5 @@ Setup of Alexa skill is required, please refer to Amazon's documentation.
 Use `ts-node test/test.ts <Intent Name>` to run the local test function using mock data.
 Use `gulp lambda` to deploy to AWS lambda.  Must have an AWS credentials file in `(User Profile)/.aws/credentials`.
 Use `ts-node util/schemaUtterancesHelper.ts` to generate Alexa Skills Kit schema and utterances.
+## Running it with alexa-app-server
+Use `yarn build` or `npm run-script build` to generate necessary files within /main directory
