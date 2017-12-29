@@ -3,9 +3,12 @@
   "version": "0.0.1",
   "license": "LICENSE.md",
   "readme": "README.md",
+  "main": "main/index.js",
   "scripts": {
-    "preinstall": "cd src && npm i && cd ..",
-    "schemaUtterances": "ts-node util/schemaUtterancesHelper.ts"
+    "preinstall": "cd src && yarn && cd ..",
+    "generate": "ts-node util/schemaUtterancesHelper.ts",
+    "deploy": "gulp lambda",
+    "build": "gulp build"
   },
   "devDependencies": {
     "@types/es6-promise": "0.0.32",
